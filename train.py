@@ -56,6 +56,7 @@ class Trainer(object):
     def __init__(self,
                  config_file='neural_network.ini',
                  model_name=None,
+                 model_path=None,
                  debug=False):
         # set TF logging verbosity
         tf.logging.set_verbosity(tf.logging.INFO)
@@ -64,6 +65,7 @@ class Trainer(object):
         self.debug = debug
         self.conf_path = get_conf_dir(debug=self.debug)
         self.conf_path = os.path.join(self.conf_path, config_file)
+        self.model_path = model_path
         self.load_configs()
 
         # Verify that the GPU is operational, if not use CPU
@@ -166,10 +168,10 @@ class Trainer(object):
             os.makedirs(self.SUMMARY_DIR)
 
         # set the model name and restore if not None
-        if model_name is not None:
-            self.model_path = os.path.join(self.SESSION_DIR, model_name)            
-        else:
-            self.model_path = None
+        # if model_name is not None:
+        #     self.model_path = os.path.join(self.SESSION_DIR, model_name)            
+        # else:
+        #     self.model_path = None
 
     def set_up_model(self):
         self.sets = ['train', 'dev', 'test']
@@ -250,9 +252,10 @@ class Trainer(object):
                 # Initializate the weights and biases
                 self.sess.run(init_op)
 
-                # MAIN LOGIC for running the training epochs
-                logger.info(section.format('Run training epoch'))
-                self.run_training_epochs()
+            # MAIN LOGIC for running the training epochs
+            logger.info(section.format('Run training epoch'))
+        
+            self.run_training_epochs()
 
             logger.info(section.format('Decoding test data'))
             # make the assumption for working on the test data, that the epoch here is the last epoch
@@ -566,12 +569,13 @@ if __name__ == '__main__':
     @click.command()
     @click.option('--config', default='neural_network.ini', help='Configuration file name')
     @click.option('--name', default=None, help='Model name for logging')
+    @click.option('--path', default=None, help='Model checkpoint path')
     @click.option('--debug', type=bool, default=False,
                   help='Use debug settings in config file')
     
    
     # Train RNN model using a given configuration file
-    def main(config='neural_network.ini', name=None, debug=False):
+    def main(config='neural_network.ini', name=None, path=None, debug=False):
         logging.basicConfig(level=logging.DEBUG,
                             format='%(asctime)s [%(levelname)s] %(name)s: %(message)s')
         global logger
@@ -579,7 +583,7 @@ if __name__ == '__main__':
 
         # create the Trainer object
         trainer = Trainer(
-            config_file=config, model_name=name, debug=debug)
+            config_file=config, model_name=name, model_path=path, debug=debug)
 
         # run the training
         trainer.run_model()

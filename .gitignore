@@ -1,0 +1,8 @@
+OnlineKHATTData
+*__pycache__*
+checkpoints/
+*.txt
+models
+features/data/
+features/onlineKhatt
+*.log

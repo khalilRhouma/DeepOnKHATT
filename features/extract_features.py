@@ -5,7 +5,7 @@ import argparse
 import scipy.cluster.vq as vq
 import numpy as np
 import glob, os
-
+from pathlib import Path
 from preprocessing import preprocess_handwriting
 from feature import calculate_feature_vector_sequence
 
@@ -66,11 +66,13 @@ def process_single_file(file,filename, outfilename, normalize=True):
 
 def main():
     
-    os.chdir("/features/inks")
-    print(len(glob.glob("*.txt")))
-    for filename in glob.glob("*.txt") :
+    # os.chdir("features/")
+    ink_paths = list(Path("features/inks").glob("*.txt"))
+    save_dir = Path("features/data")
+    print(len(ink_paths))
+    for filename in ink_paths :
             with open(filename) as file:
-                process_single_file(file,filename, 'inputs/%s_input.npy' % (filename.replace(".txt","")), normalize=True)
+                process_single_file(file,filename, f'{save_dir}/{filename.stem}_input.npy', normalize=True)
                 file.close()
                 try:
                     os.rename(filename,'processed/'+filename)
