@@ -1,5 +1,8 @@
 OnlineKHATTData
 *__pycache__*
+*.idea
+*.npy
+*.pyc
 checkpoints/
 *.txt
 models
